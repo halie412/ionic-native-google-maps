@@ -1,0 +1,1 @@
+# ionic-ionic-native-core
