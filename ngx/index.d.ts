@@ -1725,6 +1725,11 @@ export declare class GoogleMap extends BaseClass {
      * Destroy a map completely
      * @return {Promise<any>}
      */
+
+    // kwmod 2026ago27 agregado
+    isRemoved(): boolean;
+    isReady(): boolean;
+    // fin agregado
     remove(): Promise<any>;
     /**
      * Remove all overlays, such as marker

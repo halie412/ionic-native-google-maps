@@ -1276,6 +1276,14 @@ var GoogleMap = /** @class */ (function (_super) {
     GoogleMap.prototype.getVisibleRegion = function () { return cordovaInstance(this, "getVisibleRegion", { "sync": true }, arguments); };
     GoogleMap.prototype.getMyLocation = function (options) { return cordovaInstance(this, "getMyLocation", {}, arguments); };
     GoogleMap.prototype.setClickable = function (isClickable) { return cordovaInstance(this, "setClickable", { "sync": true }, arguments); };
+    // kwmod 2026ago27 agregado
+    GoogleMap.prototype.isRemoved = function() {
+        return !this._objectInstance || this._objectInstance._isRemoved === true;
+    };
+    GoogleMap.prototype.isReady = function() {
+        return !!this._objectInstance && this._objectInstance._isReady === true;
+    };
+    // fin agregado
     GoogleMap.prototype.remove = function () { return cordovaInstance(this, "remove", {}, arguments); };
     GoogleMap.prototype.clear = function () {
         var _this = this;
