@@ -1729,7 +1729,7 @@ export declare class GoogleMap extends BaseClass {
     // kwmod 2026ago27 agregado
     isRemoved(): boolean;
     isReady(): boolean;
-    isRendered(): Promise<boolean>;
+    isRendered(umbralCambio?: number): Promise<boolean>;
     // fin agregado
     remove(): Promise<any>;
     /**
