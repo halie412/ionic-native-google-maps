@@ -1297,7 +1297,7 @@ var GoogleMap = /** @class */ (function (_super) {
         }
         return this._objectInstance.refreshLayout();
     };
-    GoogleMap.prototype.isRendered = function(umbralCambio) {
+    GoogleMap.prototype.isRendered = function(umbralCambio, debug) {
         var self = this;
 
         if(umbralCambio === undefined || umbralCambio === null){
@@ -1372,13 +1372,14 @@ var GoogleMap = /** @class */ (function (_super) {
 
                     var porcentajeDominante = dominante/cantidad;
                     var aparentementeVacio = desviacion < umbralCambio && porcentajeDominante > 0.94;
-
-                    console.log('GoogleMap.isRendered',{
-                        umbralCambio:umbralCambio,
-                        desviacion:desviacion,
-                        porcentajeDominante:porcentajeDominante,
-                        aparentementeVacio:aparentementeVacio
-                    });
+                    if(debug){
+                        console.log('GoogleMap.isRendered',{
+                            umbralCambio:umbralCambio,
+                            desviacion:desviacion,
+                            porcentajeDominante:porcentajeDominante,
+                            aparentementeVacio:aparentementeVacio
+                        });
+                    }
 
                     resolve(!aparentementeVacio);
                 };
@@ -1390,7 +1391,9 @@ var GoogleMap = /** @class */ (function (_super) {
                 img.src = dataUrl;
             });
         }).catch(function(error){
-            console.log('GoogleMap.isRendered error',error);
+            if(debug){
+                console.log('GoogleMap.isRendered error',error);
+            }
             return false;
         });
     };
