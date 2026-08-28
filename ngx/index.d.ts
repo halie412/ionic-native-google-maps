@@ -1730,6 +1730,7 @@ export declare class GoogleMap extends BaseClass {
     isRemoved(): boolean;
     isReady(): boolean;
     isRendered(umbralCambio?: number): Promise<boolean>;
+    refreshLayout(): void;
     // fin agregado
     remove(): Promise<any>;
     /**

@@ -1291,6 +1291,12 @@ var GoogleMap = /** @class */ (function (_super) {
     GoogleMap.prototype.isReady = function() {
         return !!this._objectInstance && this._objectInstance._isReady === true;
     };
+    GoogleMap.prototype.refreshLayout = function() {
+        if(!this._objectInstance || this._objectInstance._isRemoved === true){
+            return;
+        }
+        return this._objectInstance.refreshLayout();
+    };
     GoogleMap.prototype.isRendered = function(umbralCambio) {
         var self = this;
 
