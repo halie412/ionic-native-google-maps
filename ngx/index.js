@@ -1277,11 +1277,86 @@ var GoogleMap = /** @class */ (function (_super) {
     GoogleMap.prototype.getMyLocation = function (options) { return cordovaInstance(this, "getMyLocation", {}, arguments); };
     GoogleMap.prototype.setClickable = function (isClickable) { return cordovaInstance(this, "setClickable", { "sync": true }, arguments); };
     // kwmod 2026ago27 agregado
+    // agregado para detectar si fue eliminado el mapa
     GoogleMap.prototype.isRemoved = function() {
         return !this._objectInstance || this._objectInstance._isRemoved === true;
     };
+    // detecta si el mapa fue iniciado
     GoogleMap.prototype.isReady = function() {
         return !!this._objectInstance && this._objectInstance._isReady === true;
+    };
+    GoogleMap.prototype.isRendered = function() {
+        var self = this;
+        if (!self._objectInstance || self._objectInstance._isRemoved === true || self._objectInstance._isReady !== true) {
+            return Promise.resolve(false);
+        }
+        return self.toDataURL().then(function(dataUrl) {
+            return new Promise(function(resolve) {
+                if (!dataUrl) {
+                    resolve(false);
+                    return;
+                }
+                var img = new Image();
+                img.onload = function() {
+                    var canvas = document.createElement('canvas');
+                    canvas.width = 60;
+                    canvas.height = 60;
+                    var ctx = canvas.getContext('2d');
+                    if (!ctx) {
+                        resolve(false);
+                        return;
+                    }
+                    ctx.drawImage(img, 0, 0, 60, 60);
+                    // Ignoro aproximadamente 10% de los bordes para reducir
+                    // influencia de logo Google, controles, etc.
+                    var data = ctx.getImageData(6, 6, 48, 48).data;
+                    var suma = 0;
+                    var suma2 = 0;
+                    var cantidad = 0;
+                    var colores = {};
+                    for (var i = 0; i < data.length; i += 4) {
+                        var r = data[i];
+                        var g = data[i + 1];
+                        var b = data[i + 2];
+                        var gris = (r + g + b) / 3;
+                        suma += gris;
+                        suma2 += gris * gris;
+                        cantidad++;
+                        // Agrupo colores para que diferencias mínimas de compresión
+                        // no cuenten como contenido real.
+                        var qr = Math.round(r / 16);
+                        var qg = Math.round(g / 16);
+                        var qb = Math.round(b / 16);
+                        var clave = qr + '_' + qg + '_' + qb;
+                        colores[clave] = (colores[clave] || 0) + 1;
+                    }
+                    if (!cantidad) {
+                        resolve(false);
+                        return;
+                    }
+                    var promedio = suma / cantidad;
+                    var varianza = (suma2 / cantidad) - (promedio * promedio);
+                    var desviacion = Math.sqrt(Math.max(0, varianza));
+                    var dominante = 0;
+                    Object.keys(colores).forEach(function(clave) {
+                        if (colores[clave] > dominante) {
+                            dominante = colores[clave];
+                        }
+                    });
+                    var porcentajeDominante = dominante / cantidad;
+                    // Sólo considero "no renderizado" cuando la imagen es
+                    // extremadamente uniforme.
+                    var aparentementeVacio = desviacion < 3 && porcentajeDominante > 0.94;
+                    resolve(!aparentementeVacio);
+                };
+                img.onerror = function() {
+                    resolve(false);
+                };
+                img.src = dataUrl;
+            });
+        }).catch(function() {
+            return false;
+        });
     };
     // fin agregado
     GoogleMap.prototype.remove = function () { return cordovaInstance(this, "remove", {}, arguments); };
